@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+set -e
+
+podman stop "$KCP_CONTAINER_NAME"

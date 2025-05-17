@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+RUST_HOME="$(rustup show home)"
+RUST_TOOLCHAIN="$(rustup show active-toolchain | cut -f 1 -d ' ')"
+
+PATH="$PATH:$RUST_HOME/toolchains/$RUST_TOOLCHAIN/bin"
+
+export PATH

@@ -1,0 +1,5 @@
+floating_ips:
+  ingress:
+    service_name: cilium-gateway-ingress
+    service_namespace: cilium-system
+log_level: debug

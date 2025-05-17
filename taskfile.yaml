@@ -1,0 +1,21 @@
+tasks:
+  lint:
+    cmds:
+    - scripts/lint
+    desc: Lint the codebase.
+    silent: true
+  run:
+    cmds:
+    - cargo run
+    deps:
+    - start-kcp
+    desc: Runs lease2fip-hcloud against local test apiserver.
+  start-kcp:
+    cmds:
+    - scripts/start-kcp
+    desc: Starts the local test apiserver.
+  stop-kcp:
+    cmds:
+    - scripts/stop-kcp
+    desc: Stops the local test apiserver.
+version: '3'
