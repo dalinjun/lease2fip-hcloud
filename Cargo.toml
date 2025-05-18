@@ -1,0 +1,23 @@
+[dependencies]
+anyhow = { default-features = false, version = "1.0" }
+config = { default-features = false, features = ["yaml"], version = "0.14" }
+hcloud = "0.21"
+futures = { default-features = false, version = "0.3" }
+k8s-openapi = { default-features = false, features = ["latest"], version = "0.25.0" }
+kube = { features = ["runtime"], version = "1.0.0" }
+serde = { default-features = false, features = ["derive"], version = "1.0" }
+tokio = { features = ["macros", "rt-multi-thread"], version = "1.45" }
+tracing = { default-features = false, version = "0.1" }
+tracing-subscriber = { default-features = false, features = ["ansi", "fmt"], version = "0.3" }
+
+[build-dependencies]
+git-version = "0.3"
+
+[package]
+name = "lease2fip-hcloud"
+version = "1.0.0"
+edition = "2024"
+
+[profile.release]
+lto = true
+strip = true

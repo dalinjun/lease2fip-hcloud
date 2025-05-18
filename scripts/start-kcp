@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+
+set -e
+
+ADMIN_CONF="admin.kubeconfig"
+KCP_ADMIN_CONF="/data/.kcp/$ADMIN_CONF"
+KCP_IMAGE="ghcr.io/kcp-dev/kcp:release-0.27"
+LOCAL_PORT="35790"
+
+# Check if container is already running
+if podman ps --filter "name=$KCP_CONTAINER_NAME" --format "{{.Names}}" | grep -q "^$KCP_CONTAINER_NAME$"; then
+	echo "KCP apiserver already running."
+
+	exit 0
+fi
+
+container_id=$(podman run --detach --publish "127.0.0.1:$LOCAL_PORT:$LOCAL_PORT/tcp" --name "$KCP_CONTAINER_NAME" --rm "$KCP_IMAGE" start --external-hostname localhost --secure-port "$LOCAL_PORT")
+
+echo "Starting KCP apiserver.."
+
+while ! podman exec "$container_id" test -f "$KCP_ADMIN_CONF"; do
+	sleep 1
+done
+
+podman cp "$container_id:$KCP_ADMIN_CONF" "$ADMIN_CONF"
+
+while ! kubectl api-resources >/dev/null 2>&1; do
+	sleep 1
+done
+
+echo "KCP apiserver ready."
