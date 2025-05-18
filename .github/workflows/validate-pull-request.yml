@@ -1,0 +1,45 @@
+name: validate-pull-request
+
+on:
+  pull_request:
+    branches:
+    - main
+  push:
+    branches:
+    - main
+
+jobs:
+  check-formatting:
+    runs-on: ubuntu-24.04
+    steps:
+    - name: Check out
+      uses: actions/checkout@v4
+    - uses: actions-rust-lang/setup-rust-toolchain@v1
+    - run: scripts/check-formatting
+  lint:
+    runs-on: ubuntu-24.04
+    steps:
+    - name: Check out
+      uses: actions/checkout@v4
+    - uses: actions-rust-lang/setup-rust-toolchain@v1
+    - run: scripts/lint
+  build:
+    needs:
+    - check-formatting
+    - lint
+    strategy:
+      matrix:
+        runner:
+        - ubuntu-24.04
+#        - ubuntu-24.04-arm
+    runs-on: ${{ matrix.runner }}
+    steps:
+    - name: Check out
+      uses: actions/checkout@v4
+    - uses: actions-rust-lang/setup-rust-toolchain@v1
+    - run: scripts/build-binary lease2fip-hcloud
+    - uses: actions/upload-artifact@v4
+      with:
+        name: lease2fip-hcloud
+        path: target/release/lease2fip-hcloud
+        retention-days: 1
