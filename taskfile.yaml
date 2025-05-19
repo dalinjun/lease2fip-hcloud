@@ -1,4 +1,8 @@
 tasks:
+  build:
+    cmds:
+    - podman build --build-arg GIT_COMMIT_HASH=dev -t dev .
+    desc: Build container image.
   lint:
     cmds:
     - scripts/lint

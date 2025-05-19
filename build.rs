@@ -1,6 +1,6 @@
 fn main() {
 	println!(
-		"cargo:rustc-env=GIT_VERSION={}",
-		git_version::git_version!()
+		"cargo:rustc-env=GIT_COMMIT_HASH={}",
+		env!("GIT_COMMIT_HASH")
 	);
 }

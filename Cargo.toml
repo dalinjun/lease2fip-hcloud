@@ -1,3 +1,7 @@
+[[bin]]
+name = "lease2fip-hcloud"
+path = "src/main.rs"
+
 [dependencies]
 anyhow = { default-features = false, version = "1.0" }
 config = { default-features = false, features = ["yaml"], version = "0.14" }
@@ -9,9 +13,6 @@ serde = { default-features = false, features = ["derive"], version = "1.0" }
 tokio = { features = ["macros", "rt-multi-thread"], version = "1.45" }
 tracing = { default-features = false, version = "0.1" }
 tracing-subscriber = { default-features = false, features = ["ansi", "fmt"], version = "0.3" }
-
-[build-dependencies]
-git-version = "0.3"
 
 [package]
 name = "lease2fip-hcloud"

@@ -2,13 +2,4 @@
 
 set -e
 
-if [ -z "$1" ]; then
-	echo "Missing binary name"
-
-	exit 1
-fi
-
-cargo build --bin "$1" --release
-
-file target/release/"$1"
-ls -l target/release/"$1"
+RUSTFLAGS="-D warnings" cargo build --release

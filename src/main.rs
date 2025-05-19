@@ -25,9 +25,9 @@ struct TargetServiceConfig {
 	service_namespace: String,
 }
 
+const CARGO_PKG_VERSION: &str = env!("CARGO_PKG_VERSION");
 const CONFIG_FILENAME: &str = "config.yaml";
-const RELEASE: &str = env!("CARGO_PKG_VERSION");
-const COMMIT: &str = env!("GIT_VERSION");
+const GIT_COMMIT_HASH: &str = env!("GIT_COMMIT_HASH");
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
@@ -44,7 +44,7 @@ async fn main() -> anyhow::Result<()> {
 
 	tracing_subscriber::fmt().with_max_level(log_level).init();
 
-	info!("release {} commit {}", RELEASE, COMMIT);
+	info!("release {}-{}", CARGO_PKG_VERSION, GIT_COMMIT_HASH);
 
 	let current_namespace = option_env!("POD_NAMESPACE").unwrap_or_else(|| "default");
 
