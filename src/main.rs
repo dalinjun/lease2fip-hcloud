@@ -31,11 +31,6 @@ const COMMIT: &str = env!("GIT_VERSION");
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
-	let current_namespace = env::var("POD_NAMESPACE").unwrap_or_else(|_| "default".to_string());
-
-	let hcloud_token = env::var("HCLOUD_TOKEN")
-		.map_err(|_| anyhow::anyhow!("HCLOUD_TOKEN environment variable is required"))?;
-
 	let config: ConfigRoot = config::Config::builder()
 		.add_source(config::File::with_name(CONFIG_FILENAME))
 		.build()?
@@ -51,14 +46,22 @@ async fn main() -> anyhow::Result<()> {
 
 	info!("release {} commit {}", RELEASE, COMMIT);
 
+	let current_namespace = option_env!("POD_NAMESPACE").unwrap_or_else(|| "default");
+
+	let Some(hcloud_token) = option_env!("HCLOUD_TOKEN") else {
+		error!("HCLOUD_TOKEN environment variable is required");
+
+		std::process::exit(1);
+	};
+
 	let mut hcloud_config = Configuration::new();
-	hcloud_config.bearer_access_token = Some(hcloud_token);
+	hcloud_config.bearer_access_token = Some(hcloud_token.to_string());
 
 	let k8s_client = Client::try_default().await?;
 
 	info!("using namespace: {}", current_namespace);
 
-	let api: Api<Lease> = Api::namespaced(k8s_client.clone(), &current_namespace);
+	let api: Api<Lease> = Api::namespaced(k8s_client.clone(), current_namespace);
 
 	let lease_to_fip_name_mapping: Arc<HashMap<String, String>> = Arc::new(
 		config
