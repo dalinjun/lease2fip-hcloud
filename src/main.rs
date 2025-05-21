@@ -26,13 +26,14 @@ struct TargetServiceConfig {
 }
 
 const CARGO_PKG_VERSION: &str = env!("CARGO_PKG_VERSION");
-const CONFIG_FILENAME: &str = "config.yaml";
 const GIT_COMMIT_HASH: &str = env!("GIT_COMMIT_HASH");
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
+	let config_filename = option_env!("CONFIG_FILENAME").unwrap_or("config.yaml");
+
 	let config: ConfigRoot = config::Config::builder()
-		.add_source(config::File::with_name(CONFIG_FILENAME))
+		.add_source(config::File::with_name(config_filename))
 		.build()?
 		.try_deserialize()?;
 
