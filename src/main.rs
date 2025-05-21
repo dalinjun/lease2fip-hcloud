@@ -16,7 +16,6 @@ use tracing::*;
 #[derive(Debug, Deserialize)]
 struct ConfigRoot {
 	floating_ips: HashMap<String, TargetServiceConfig>,
-	log_level: Option<String>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -30,22 +29,24 @@ const GIT_COMMIT_HASH: &str = env!("GIT_COMMIT_HASH");
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
-	let config_filename = option_env!("CONFIG_FILENAME").unwrap_or("config.yaml");
+	let log_level = option_env!("LOG_LEVEL").unwrap_or("info");
 
-	let config: ConfigRoot = config::Config::builder()
-		.add_source(config::File::with_name(config_filename))
-		.build()?
-		.try_deserialize()?;
-
-	let log_level = config.log_level.unwrap_or("info".to_string());
-
-	let Ok(log_level) = Level::from_str(&log_level) else {
+	let Ok(log_level) = Level::from_str(log_level) else {
 		panic!("invalid log level {}", log_level)
 	};
 
 	tracing_subscriber::fmt().with_max_level(log_level).init();
 
 	info!("release {}-{}", CARGO_PKG_VERSION, GIT_COMMIT_HASH);
+
+	let config_filename = option_env!("CONFIG_FILENAME").unwrap_or("config.yaml");
+
+	info!("loading config from file: {}", config_filename);
+
+	let config: ConfigRoot = config::Config::builder()
+		.add_source(config::File::with_name(config_filename))
+		.build()?
+		.try_deserialize()?;
 
 	let current_namespace = option_env!("POD_NAMESPACE").unwrap_or_else(|| "default");
 
@@ -60,7 +61,7 @@ async fn main() -> anyhow::Result<()> {
 
 	let k8s_client = Client::try_default().await?;
 
-	info!("using namespace: {}", current_namespace);
+	info!("watching leases in namespace: {}", current_namespace);
 
 	let api: Api<Lease> = Api::namespaced(k8s_client.clone(), current_namespace);
 
