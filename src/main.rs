@@ -29,9 +29,9 @@ const GIT_COMMIT_HASH: &str = env!("GIT_COMMIT_HASH");
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
-	let log_level = option_env!("LOG_LEVEL").unwrap_or("info");
+	let log_level = std::env::var("LOG_LEVEL").unwrap_or("info".to_string());
 
-	let Ok(log_level) = Level::from_str(log_level) else {
+	let Ok(log_level) = Level::from_str(&log_level) else {
 		panic!("invalid log level {}", log_level)
 	};
 
@@ -39,18 +39,18 @@ async fn main() -> anyhow::Result<()> {
 
 	info!("release {}-{}", CARGO_PKG_VERSION, GIT_COMMIT_HASH);
 
-	let config_filename = option_env!("CONFIG_FILENAME").unwrap_or("config.yaml");
+	let config_filename = std::env::var("CONFIG_FILENAME").unwrap_or("config.yaml".to_string());
 
 	info!("loading config from file: {}", config_filename);
 
 	let config: ConfigRoot = config::Config::builder()
-		.add_source(config::File::with_name(config_filename))
+		.add_source(config::File::with_name(&config_filename))
 		.build()?
 		.try_deserialize()?;
 
-	let current_namespace = option_env!("POD_NAMESPACE").unwrap_or_else(|| "default");
+	let current_namespace = std::env::var("POD_NAMESPACE").unwrap_or("default".to_string());
 
-	let Some(hcloud_token) = option_env!("HCLOUD_TOKEN") else {
+	let Ok(hcloud_token) = std::env::var("HCLOUD_TOKEN") else {
 		error!("HCLOUD_TOKEN environment variable is required");
 
 		std::process::exit(1);
@@ -63,7 +63,7 @@ async fn main() -> anyhow::Result<()> {
 
 	info!("watching leases in namespace: {}", current_namespace);
 
-	let api: Api<Lease> = Api::namespaced(k8s_client.clone(), current_namespace);
+	let api: Api<Lease> = Api::namespaced(k8s_client.clone(), &current_namespace);
 
 	let lease_to_fip_name_mapping: Arc<HashMap<String, String>> = Arc::new(
 		config
