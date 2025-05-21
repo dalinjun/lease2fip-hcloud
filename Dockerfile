@@ -28,5 +28,5 @@ RUN scripts/check-formatting && scripts/lint && scripts/build-binary
 
 # Prepare runner image.
 FROM gcr.io/distroless/cc-debian12 AS runner
-COPY --from=builder /build/target/release/lease2fip-hcloud /lease2fip-hcloud
-ENTRYPOINT ["/lease2fip-hcloud"]
+COPY --from=builder /build/target/release/lease2fip-hcloud /app/lease2fip-hcloud
+ENTRYPOINT ["/app/lease2fip-hcloud"]
