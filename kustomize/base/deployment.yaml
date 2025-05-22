@@ -1,0 +1,46 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lease2fip-hcloud
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: lease2fip-hcloud
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: lease2fip-hcloud
+    spec:
+      serviceAccountName: lease2fip-hcloud
+      containers:
+      - name: lease2fip-hcloud
+        image: "ghcr.io/dalinjun/lease2fip-hcloud:main"
+        imagePullPolicy: Always
+        env:
+        - name: CONFIG_FILENAME
+          value: /config/config.yaml
+        - name: LOG_LEVEL
+          value: info
+        - name: HCLOUD_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: lease2fip-hcloud-token
+              key: token
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        resources:
+          requests:
+            memory: 4Mi
+          limits:
+            memory: 8Mi
+        volumeMounts:
+        - mountPath: /config
+          name: config
+      volumes:
+      - configMap:
+          name: lease2fip-hcloud
+        name: config
