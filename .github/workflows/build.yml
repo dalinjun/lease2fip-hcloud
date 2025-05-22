@@ -19,7 +19,9 @@ jobs:
       uses: actions/checkout@v4
 
     - name: Build kustomization
-      run: kustomize build kustomize/example
+      run: |
+        kustomize build kustomize/base
+        kustomize build kustomize/example
 
   build-container-image:
     strategy:
