@@ -1,4 +1,7 @@
 floating_ips:
+  # Name of floating IP in HCloud
   ingress:
+    # Name of Service LoadBalancer
     service_name: cilium-gateway-ingress
+    # Namespace of Service LoadBalancer
     service_namespace: cilium-system
